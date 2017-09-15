@@ -5,9 +5,12 @@ from scrapy.contrib.exporter import CsvItemExporter
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
+# from festivals.FestivalCsvExporter import FestivalCsvExporter
 
 
 class FestivalsPipeline(object):
+    fields_to_export = ['FESTIVAL_NAME', 'EVENT_ON', 'CATEGORY', 'URL', 'SOCIAL', 'EMAIL', 'ADDRESS', 'ZIP_CODE', 'CITY']
+
     @classmethod
     def from_crawler(cls, crawler):
         pipeline = cls()
@@ -16,14 +19,23 @@ class FestivalsPipeline(object):
         return pipeline
 
     def spider_opened(self, spider):
-        self.file = open('/Users/sashko/Documents/workspace/festivals/output.csv', 'w+b')
-        self.exporter = CsvItemExporter(self.file)
-        self.exporter.start_exporting()
+        # nord-pas-de-calais
+        self.file_nord = open('/Users/sashko/Documents/workspace/festivals/festivals-nord-pas-de-calais.csv', 'w+b')
+        self.file_all = open('/Users/sashko/Documents/workspace/festivals/festivals-all.csv', 'w+b')
+        self.exporter_nord = CsvItemExporter(self.file_nord)
+        self.exporter_all = CsvItemExporter(self.file_all)
+        self.exporter_nord.start_exporting()
+        self.exporter_all.start_exporting()
+        self.exporter_all.fields_to_export = self.fields_to_export
+        self.exporter_nord.fields_to_export = self.fields_to_export
 
     def spider_closed(self, spider):
-        self.exporter.finish_exporting()
-        self.file.close()
+        self.exporter_nord.finish_exporting()
+        self.exporter_all.finish_exporting()
+        self.file_nord.close()
 
     def process_item(self, item, spider):
-        self.exporter.export_item(item)
+        if item['isRegion'] == True:
+            self.exporter_nord.export_item(item)
+        self.exporter_all.export_item(item)
         return item

@@ -9,15 +9,15 @@ import scrapy
 
 
 class FestivalsItem(scrapy.Item):
-    name = scrapy.Field()
-    date = scrapy.Field()
-    category = scrapy.Field()
-    url = scrapy.Field()
-    social = scrapy.Field()
-    email = scrapy.Field()
-    address = scrapy.Field()
-    zip = scrapy.Field()
-    city = scrapy.Field()
+    FESTIVAL_NAME = scrapy.Field()
+    EVENT_ON = scrapy.Field()
+    CATEGORY = scrapy.Field()
+    URL = scrapy.Field()
+    SOCIAL = scrapy.Field()
+    EMAIL = scrapy.Field()
+    ADDRESS = scrapy.Field()
+    ZIP_CODE = scrapy.Field()
+    CITY = scrapy.Field()
     isRegion = scrapy.Field()
     page_url = scrapy.Field()
     pass

@@ -61,6 +61,8 @@ class FestivalsParser(Spider):
         else:
             date = xhs.xpath(self.date_xpath).extract()[0]
             category = self.compress_str(xhs.xpath(self.category_xpath).extract())
+        if '\n' in category:
+            category = ''
         url = ''
         url_check = xhs.xpath(self.url_xpath).extract()
         if url_check:
@@ -82,6 +84,9 @@ class FestivalsParser(Spider):
         info = xhs.xpath(self.address_info).extract()
         address = self.compress_str(info[0])
         city_zip = self.compress_str(info[1])
+        if not re.findall(r"(\d{5})", city_zip):
+            address = address + ' ' + city_zip
+            city_zip = self.compress_str(info[2])
         zip = ''
         city = ''
         if city_zip == 'France':
@@ -90,21 +95,24 @@ class FestivalsParser(Spider):
         else:
             zip = city_zip.split(' ')[0]
             city = self.compress_str(city_zip.split(zip)[1])
+            if re.findall(r"(\d{5})", city):
+                zip = self.compress_str(info[2]).split(' ')[0]
+                city = self.compress_str(info[2]).split(' ')[1]
         is_region = 'nord-pas-de-calais' in response.request.headers.get('Referer', None)
         if len(twitter):
             facebook = facebook + ' ' + twitter
         festival = FestivalsItem()
-        festival['name'] = name
-        festival['date'] = date
-        festival['category'] = category
-        festival['social'] = facebook
-        festival['email'] = email
-        festival['address'] = address
-        festival['zip'] = zip
-        festival['city'] = city
+        festival['FESTIVAL_NAME'] = name
+        festival['EVENT_ON'] = date
+        festival['CATEGORY'] = category
+        festival['SOCIAL'] = facebook
+        festival['EMAIL'] = email
+        festival['ADDRESS'] = address
+        festival['ZIP_CODE'] = zip
+        festival['CITY'] = city
         festival['isRegion'] = is_region
         festival['page_url'] = response.url
-        festival['url'] = url
+        festival['URL'] = url
         return festival
 
     def compress_str(self, str, findEmail=False):
